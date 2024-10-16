@@ -1,17 +1,18 @@
 import conf from '../conf/conf.js';
-import { Client, Account, ID } from "appwrite";
+import { Client, Account, Storage, ID } from "appwrite";
 
 
 export class AuthService {
     client = new Client();
     account;
+    storage;
 
     constructor() {
         this.client.setEndpoint(conf.appwriteUrl);
         this.client.setProject(conf.appwriteProjectId);
 
         this.account = new Account(this.client);
-            
+        this.storage = new Storage(this.client);
     }
 
     async createAccount({email, password, name}) {
@@ -43,7 +44,7 @@ export class AuthService {
             console.log("Appwrite serive :: getCurrentUser :: error", error);
         }
 
-        return null;
+        return error;
     }
 
     async logout() {
@@ -52,6 +53,14 @@ export class AuthService {
             await this.account.deleteSessions();
         } catch (error) {
             console.log("Appwrite serive :: logout :: error", error);
+        }
+    }
+
+    async imagePreview({imageId}) {
+        try {
+            return this.storage.getFilePreview(conf.appwriteBucketId ,imageId);
+        } catch (error) {
+            console.log("Appwrite serive :: Image Preview :: error", error);
         }
     }
 }
